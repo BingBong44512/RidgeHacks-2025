@@ -23,6 +23,7 @@
 <script>
 let map, marker;
 let numOrbsGone =5;
+let county;
 
 function initMap(lat, lng) {
   map = L.map('map').setView([lat, lng], 15);
@@ -49,7 +50,8 @@ function spawnNearbyOrbs(centerLat, centerLng) {
   for (let i = 0; i < numOrbsGone; i++) {
     const latOffset = getRandomOffset(100); // 100m range
     const lngOffset = getRandomOffset(100);
-    spawnOrb(centerLat + latOffset, centerLng + lngOffset, `Orb #${i + 1}`);
+    spawnOrb(centerLat + latOffset, centerLng + lngOffset, `Orb #${county}`);
+    county++;
     
   }
   numOrbsGone=0;
