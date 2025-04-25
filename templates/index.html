@@ -22,6 +22,7 @@
 
 <script>
 let map, marker;
+let numOrbsGone =5;
 
 function initMap(lat, lng) {
   map = L.map('map').setView([lat, lng], 15);
@@ -33,11 +34,25 @@ function initMap(lat, lng) {
   marker = L.marker([lat, lng]).addTo(map)
     .bindPopup('You are here!')
     .openPopup();
+
+  spawnNearbyOrbs(lat, lng); // Call to spawn orbs
 }
+
 
 function updateMarker(lat, lng) {
   marker.setLatLng([lat, lng]);
-  map.setView([lat, lng]);
+  // map.setView([lat, lng]);
+  spawnNearbyOrbs(lat, lng);
+}
+
+function spawnNearbyOrbs(centerLat, centerLng) {
+  for (let i = 0; i < numOrbsGone; i++) {
+    const latOffset = getRandomOffset(100); // 100m range
+    const lngOffset = getRandomOffset(100);
+    spawnOrb(centerLat + latOffset, centerLng + lngOffset, `Orb #${i + 1}`);
+    
+  }
+  numOrbsGone=0;
 }
 
 navigator.geolocation.watchPosition(function(position) {
@@ -61,8 +76,35 @@ navigator.geolocation.watchPosition(function(position) {
 }, {
   enableHighAccuracy: true,
   maximumAge: 0,
-  timeout: 5000
+  timeout: 100
 });
+
+function getRandomOffset(meters) {
+  const earth = 111_000; // meters per degree
+  return (Math.random() - 0.5) * (meters / earth * 2);
+}
+
+function spawnOrb(lat, lng, name = "Orb") {
+  const orbIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/188/188987.png', // placeholder orb
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40]
+  });
+
+  const orbMarker = L.marker([lat, lng], { icon: orbIcon }).addTo(map);
+  orbMarker.bindPopup(`${name} appeared!`);
+
+  orbMarker.on('click', () => {
+    alert(`You tapped on ${name}!`);
+    // Optionally: remove orb from map or start a battle
+    numOrbsGone+=1;
+    map.removeLayer(orbMarker);
+  });
+}
+
+
+
 </script>
 </body>
 </html>
